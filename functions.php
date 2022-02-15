@@ -25,6 +25,19 @@ function request_check(){
     }
 }
 
+function check_language($str, $language){
+    //global $peer_id;
+    if($language == "en"){
+        //message_send($peer_id, "en".$str.preg_match("/^[a-zA-Z]+$/u", $str));
+        return preg_match("/^[a-zA-Z\-]+$/u", $str);
+    } elseif($language == "ru"){
+        //message_send($peer_id, "ru".$str.preg_match("/^[а-яА-ЯёЁ]+$/u",$str));
+        return preg_match("/^[а-яА-ЯёЁ\-]+$/u",$str);
+    } else {
+        return false;
+    }
+}
+
 function transliterate($textcyr = null, $textlat = null) {
     $cyr = array(
     'ж',  'ч',  'щ',   'ш',  'ю',  'а', 'б', 'в', 'г', 'д', 'е', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ъ', 'ь', 'я',
@@ -229,8 +242,8 @@ function form_name($text, $language){
         $name2 = trim(ucfirst(strtolower($names[1])));
         $name3 = trim(ucfirst(strtolower($names[2])));
     } else {
-        global $peer_id;
-        message_send($peer_id, $templates[$language]);
+        global $from_id;
+        message_send($from_id, $templates[$language]);
         exit();
     }
     return array($name1, $name2, $name3);
@@ -239,16 +252,24 @@ function form_name($text, $language){
 function insert_name($name, $langusage){
     global $from_id;
     global $link;
-    if($langusage == "ru"){
+    //message_send($from_id, check_language($name[0], "en")." ".check_language($name[1], "en")." ".check_language($name[2], "en"));
+    if($langusage == "ru" && check_language($name[0], "ru") == true && check_language($name[1], "ru") == true && check_language($name[2], "ru") == true){
         $stmt = $link -> prepare("UPDATE `users` SET `name1` = ?, `name2` = ?, `name3` = ? WHERE `vk_id` = ?");
         $stmt -> bind_param('sssi', $name[0], $name[1], $name[2], $from_id);
         $stmt -> execute();
         $stmt -> close();
-        $stmt = $link -> prepare("UPDATE `users` SET `en_name1` = ?, `en_name2` = ?, `en_name3` = ? WHERE `vk_id` = ?");
-        $stmt -> bind_param('sssi', transliterate($name[0]), transliterate($name[1]), transliterate($name[2]), $from_id);
-        $stmt -> execute();
-        return 1;
-    }elseif ($langusage == "en"){
+        if($name[2] == "Отчества нет"){
+            $stmt = $link -> prepare("UPDATE `users` SET `en_name1` = ?, `en_name2` = ?, `en_name3` = ? WHERE `vk_id` = ?");
+            $stmt -> bind_param('sssi', transliterate($name[0]), transliterate($name[1]), $name[2], $from_id);
+            $stmt -> execute();
+            return 1;
+        } else {
+            $stmt = $link -> prepare("UPDATE `users` SET `en_name1` = ?, `en_name2` = ?, `en_name3` = ? WHERE `vk_id` = ?");
+            $stmt -> bind_param('sssi', transliterate($name[0]), transliterate($name[1]), transliterate($name[2]), $from_id);
+            $stmt -> execute();
+            return 1;
+        }
+    }elseif ($langusage == "en"  && check_language($name[0], "en") && check_language($name[1], "en") && check_language($name[2], "en")){
         $stmt = $link -> prepare("UPDATE `users` SET `en_name1` = ?, `en_name2` = ?, `en_name3` = ? WHERE `vk_id` = ?");
         $stmt -> bind_param('sssi', $name[0], $name[1], $name[2], $from_id);
         $stmt -> execute();
