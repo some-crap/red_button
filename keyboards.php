@@ -125,7 +125,7 @@ $keyboards = array(
                             {
                             "action": {
                             "type": "text",
-                            "label": "Верно",
+                            "label": "Дальше",
                             "payload": "{\"button\": \"reg_next\"}"
                             },
                             "color": "primary"
@@ -134,19 +134,19 @@ $keyboards = array(
                     ]
                     }',
                     
-                "reg_send" => '{
-                    "one_time": true,
-                    "buttons": [
-                        [
-                            {
-                            "action": {
-                            "type": "text",
-                            "label": "Отправить",
-                            "payload": "{\"button\": \"reg_next\"}"
-                            },
-                            "color": "primary"
-                            }
+                    "reg_send" => '{
+                        "one_time": true,
+                        "buttons": [
+                            [
+                                {
+                                "action": {
+                                "type": "text",
+                                "label": "Отправить",
+                                "payload": "{\"button\": \"reg_next\"}"
+                                },
+                                "color": "primary"
+                                }
+                            ]
                         ]
-                    ]
-                    }',
+                        }'
     );
