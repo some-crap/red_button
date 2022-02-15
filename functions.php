@@ -221,13 +221,13 @@ function form_name($text, $language){
     $names = explode(" ", $text);
     $amount = count($names);
     if($amount == 2){
-        $name1 = ucfirst(strtolower($names[0]));
-        $name2 = ucfirst(strtolower($names[1]));
+        $name1 = trim(ucfirst(strtolower($names[0])));
+        $name2 = trim(ucfirst(strtolower($names[1])));
         $name3 = "Отчества нет";
     }elseif($amount == 3){
-        $name1 = ucfirst(strtolower($names[0]));
-        $name2 = ucfirst(strtolower($names[1]));
-        $name3 = ucfirst(strtolower($names[2]));
+        $name1 = trim(ucfirst(strtolower($names[0])));
+        $name2 = trim(ucfirst(strtolower($names[1])));
+        $name3 = trim(ucfirst(strtolower($names[2])));
     } else {
         global $peer_id;
         message_send($peer_id, $templates[$language]);
