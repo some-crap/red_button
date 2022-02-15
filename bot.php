@@ -77,13 +77,15 @@ if (get_user_condition() == "wait_for_name_ru"){
     if(insert_name(form_name($text, "ru"), "ru") == 0){
         message_send($peer_id, "Упс, у нас что-то пошло не так.\nДавайте попробуем ещё раз.");
     } else{
-        set_user_condition("reg_ru_check");
-        message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("ru"), $keyboards['change_reg']);
+        set_user_condition("reg_en_check"); 
+        message_send($peer_id, "Проверь, верно ли мы перевели имя: ".get_user_name("en"), $keyboards['change_reg']);
+        //set_user_condition("reg_ru_check");
+        //message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("ru"), $keyboards['change_reg']);
     }
     exit();
 }
 
-if(get_user_condition() == "reg_ru_check"){
+if(get_user_condition() == "reg_ru_check"){ // обходим.
     if($payload == "reg_next") {
         set_user_condition("reg_en_check"); 
         message_send($peer_id, "Замечательно. Теперь проверь, верно ли мы перевели твои данные на английский.");
@@ -105,8 +107,10 @@ if (get_user_condition() == "wait_for_name_en"){
     }elseif(insert_name(form_name($text, "en"), "en") == 0){
         message_send($peer_id, "Упс, у нас что-то пошло не так.\nДавайте попробуем ещё раз.");
     } else{
-        set_user_condition("reg_en_check");
-        message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("en"), $keyboards['change_reg']);
+        set_user_condition("wait_for_faculty");
+        message_send($peer_id, "А теперь расскажи нам, на каком факультете ты учишься.", keyboard_gen(1));
+        //set_user_condition("reg_en_check");
+        //message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("en"), $keyboards['change_reg']);
     }
     exit();
 }
@@ -119,7 +123,7 @@ if(get_user_condition() == "reg_en_check"){
         set_user_condition("wait_for_name_en");
         message_send($peer_id, "Хорошо, введи ФИО ещё раз.\nНапример, Sadovnichiy Viktor Anatolevich");
     } else {
-        message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("en"), $keyboards['change_reg']);
+        //message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("en"), $keyboards['change_reg']);
     }
     exit();
 }
@@ -131,10 +135,12 @@ if(get_user_condition() == "wait_for_faculty"){
         message_send($peer_id, "Страница ".$page, keyboard_gen($page));
     } elseif(count($page) == 2 && $page[0] == "fac"){
         if(set_user_faculty($page[1])){
-            set_user_condition("reg_fac_check");
-            $f = json_decode(file_get_contents("faculties.json"));
-            $f = $f -> facs;
-            message_send($peer_id, $f[$page[1]]." твой факультет?", $keyboards['change_reg']);
+            set_user_condition("wait_for_course"); 
+            message_send($peer_id, "А теперь выбери свой курс.", $keyboards['reg_select_course']);
+            //set_user_condition("reg_fac_check");
+            //$f = json_decode(file_get_contents("faculties.json"));
+            //$f = $f -> facs;
+            //message_send($peer_id, $f[$page[1]]." твой факультет?", $keyboards['change_reg']);
         }
     } else {
         message_send($peer_id, "Выбери свой факультет.", keyboard_gen(1));
@@ -142,7 +148,7 @@ if(get_user_condition() == "wait_for_faculty"){
     exit();
 }
 
-if(get_user_condition() == "reg_fac_check"){
+if(get_user_condition() == "reg_fac_check"){ // обходим
     if($payload == "reg_next") {
         set_user_condition("wait_for_course"); 
         message_send($peer_id, "А теперь выбери свой курс.", $keyboards['reg_select_course']);
@@ -160,8 +166,10 @@ if (get_user_condition() == "wait_for_course"){
     $course = explode("_", $payload);
     if(count($course) == 2 && $course[0] == "course"){
         if(set_user_course($course[1])){
-            set_user_condition("reg_course_check");
-            message_send($peer_id, $course[1]." точно твой курс?", $keyboards['change_reg']);
+            set_user_condition("wait_for_group"); 
+            message_send($peer_id, "А теперь напиши номер своей группы.\nНапример, 143-М");
+            //set_user_condition("reg_course_check");
+            //message_send($peer_id, $course[1]." точно твой курс?", $keyboards['change_reg']);
         }
     } else {
         message_send($peer_id, "Выбери свой курс.", $keyboards['reg_select_course']);
@@ -169,7 +177,7 @@ if (get_user_condition() == "wait_for_course"){
     exit();
 }
 
-if(get_user_condition() == "reg_course_check"){
+if(get_user_condition() == "reg_course_check"){ // обходим
     if($payload == "reg_next") {
         set_user_condition("wait_for_group"); 
         message_send($peer_id, "А теперь напиши номер своей группы.\nНапример, 143-М");
@@ -186,12 +194,14 @@ if(get_user_condition() == "reg_course_check"){
 if (get_user_condition() == "wait_for_group"){
     $text = substr($text, 0, 10);
     set_user_group($text);
-    set_user_condition("reg_group_check");
-    message_send($peer_id, $text." точно твоя группа?", $keyboards['change_reg']);
+    set_user_condition("wait_for_photos"); 
+    message_send($peer_id, "Теперь отправь нам фотографию своего студенческого.");
+    //set_user_condition("reg_group_check");
+    //message_send($peer_id, $text." точно твоя группа?", $keyboards['change_reg']);
     exit();
 }
 
-if(get_user_condition() == "reg_group_check"){
+if(get_user_condition() == "reg_group_check"){ // обходим
     if($payload == "reg_next") {
         set_user_condition("wait_for_photos"); 
         message_send($peer_id, "Теперь отправь нам фотографию своего студенческого.");
@@ -264,7 +274,11 @@ if(get_user_condition() == "wait_for_photos"){
         message_send($from_id, "Фото принято. Можно загрузить ещё файл или перейти на следующий шаг. ", $keyboards['next_reg']);
         exit();
     } else {
-        message_send($peer_id, "Необходимо загрузить фотографию студенческого.", $keyboards['next_reg']);
+        if (get_user_id_photos() == null or get_user_id_photos() == ""){
+            message_send($peer_id, "Необходимо загрузить фотографию студенческого.");
+        } else {
+            message_send($peer_id, "Можно загрузить ещё фотографию или продолжить.", $keyboards['next_reg']);
+        }
     }
     exit();
 }
@@ -326,7 +340,11 @@ if(get_user_condition() == "wait_for_selfie"){
         message_send($from_id, "Фото принято. Можно загрузить ещё селфи или завершить регистрацию. ", $keyboards['next_reg']);
         exit();
     } else {
-        message_send($peer_id, "Необходимо загрузить селфи со студенческим.", $keyboards['next_reg']);
+        if (get_user_photos() == null or get_user_photos() == ""){
+            message_send($peer_id, "Необходимо загрузить селфи со студенческим.");
+        } else {
+            message_send($peer_id, "Можно загрузить ещё селфи или продолжить.", $keyboards['next_reg']);
+        }
     }
     exit();
 }
