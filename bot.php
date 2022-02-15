@@ -75,7 +75,7 @@ if(!is_user_in_db($from_id)){
 //
 if (get_user_condition() == "wait_for_name_ru"){
     if(insert_name(form_name($text, "ru"), "ru") == 0){
-        message_send($peer_id, "Упс, у нас что-то пошло не так.\nДавайте попробуем ещё раз.");
+        message_send($peer_id, "Имя может содержать только русские буквы и дефис, без дополнительных символов. Попробуй ещё раз.");
     } else{
         set_user_condition("reg_en_check"); 
         message_send($peer_id, "Проверь, верно ли мы перевели имя: ".get_user_name("en"), $keyboards['change_reg']);
@@ -105,7 +105,7 @@ if (get_user_condition() == "wait_for_name_en"){
         set_user_condition("wait_for_faculty");
         message_send($peer_id, "А теперь расскажи нам, на каком факультете ты учишься.");
     }elseif(insert_name(form_name($text, "en"), "en") == 0){
-        message_send($peer_id, "Упс, у нас что-то пошло не так.\nДавайте попробуем ещё раз.");
+        message_send($peer_id, "Имя на английском может содержать только латинские буквы и дефис, без дополнительных символов. Попробуй ещё раз.");
     } else{
         set_user_condition("wait_for_faculty");
         message_send($peer_id, "А теперь расскажи нам, на каком факультете ты учишься.", keyboard_gen(1));
@@ -123,7 +123,7 @@ if(get_user_condition() == "reg_en_check"){
         set_user_condition("wait_for_name_en");
         message_send($peer_id, "Хорошо, введи ФИО ещё раз.\nНапример, Sadovnichiy Viktor Anatolevich");
     } else {
-        //message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("en"), $keyboards['change_reg']);
+        message_send($peer_id, "Проверь, всё ли верно: ".get_user_name("en"), $keyboards['change_reg']);
     }
     exit();
 }
@@ -354,7 +354,8 @@ if(get_user_condition() == "go_to_send"){
         set_user_condition("wait_for_moderation"); 
         message_send($peer_id, "Отправили данные модераторам на проверку. Теперь нужно немного подождать.");
     } else {
-        message_send($peer_id, "Отправить данные на проверку модераторам?", $keyboards['reg_send']);
+        $f = json_decode(file_get_contents("faculties.json"));
+        message_send($peer_id, "Всё верно?:\nФИО: ".get_user_name("ru")."\nФИО (англ): ".get_user_name("en")."\nФакультет: ".get_user_faculty()."\nКурс: ".$f[get_user_course()]."\nГруппа".get_user_group(), $keyboards['final_check']);
     }
     exit();
 }
